@@ -1,2 +1,2 @@
 # cs_materials_science
-A machine-learning tutorial on how to identify materials descriptors. The focus is laid on using the sure independence screening and sparsifying operator (SISSO) for regression.)
+A machine-learning tutorial on how to identify materials descriptors. The focus is laid on using the sure independence screening and sparsifying operator (SISSO) for regression.
