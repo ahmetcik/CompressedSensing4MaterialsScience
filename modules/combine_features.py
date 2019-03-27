@@ -60,7 +60,7 @@ def _my_sum_exp_power_2(row):
 def _my_sum_exp_power_3(row):
     return exp(pow(row[0] + row[1], 3))
   
-def combine_features(df=None, allowed_operations=None):
+def combine_features(df=None, allowed_operations=None, is_print=True):
     """Generate combination of features given a dataframe and a list of allowed operations.
     
     For the exponentials, we introduce a characteristic energy/length
@@ -68,11 +68,11 @@ def combine_features(df=None, allowed_operations=None):
     ..todo:: Fix under/overflow errors, and introduce handling of exceptions.
 
     """
-        
-    if allowed_operations:
-        print('Selected operations:\n {0}'.format(allowed_operations)) 
-    else:
-        print('No allowed operations selected.') 
+    if is_print:
+        if allowed_operations:
+            print('Selected operations:\n {0}'.format(allowed_operations)) 
+        else:
+            print('No allowed operations selected.') 
         
     columns_ = df.columns.tolist()    
     
@@ -427,12 +427,12 @@ def combine_features(df=None, allowed_operations=None):
 
     if df_list:
         df_combined_features = pd.concat(df_list, axis=1)
-    else:
+    elif is_print:
         print('No features selected. Please select at least two primary features.')
         
 
-    
-    print('Number of total features generated: {0}'.format(df_combined_features.shape[1]))
+    if is_print:
+        print('Number of total features generated: {0}'.format(df_combined_features.shape[1]))
     
     return df_combined_features
 
