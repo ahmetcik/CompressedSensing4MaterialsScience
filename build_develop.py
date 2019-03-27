@@ -21,10 +21,10 @@ for struc in Structures_list:
 
         Atoms_list.append(atoms_ase)
     
-    ase.io.write('data_build/%s.xyz' % struc, Atoms_list)
+    ase.io.write('data_develop/%s.xyz' % struc, Atoms_list)
 
-structures_RS = ase.io.read('data_build/RS.xyz', ':')
-structures_ZB = ase.io.read('data_build/ZB.xyz', ':')
+structures_RS = ase.io.read('data_develop/RS.xyz', ':')
+structures_ZB = ase.io.read('data_develop/ZB.xyz', ':')
 
 structures_dict_RS = {get_chemical_formula_binaries(at): at  for at in structures_RS}
 structures_dict_ZB = {get_chemical_formula_binaries(at): at  for at in structures_ZB}
@@ -43,7 +43,7 @@ struc_obj_min_labels = ('struc_obj_'+df['min_struc_type'] ).values
 struc_obj_min = [df.loc[df.index[i], struc_obj_min_labels[i]] for i in range(df.shape[0])]
 df['struc_obj_min'] =  struc_obj_min
 
-df_atomic = pd.read_csv('data_build/Octet_binaries_atomic_features.csv', index_col=0)
+df_atomic = pd.read_csv('data_develop/Octet_binaries_atomic_features.csv', index_col=0)
 
 df = df.merge(df_atomic,  left_index=True, right_index=True)
 
