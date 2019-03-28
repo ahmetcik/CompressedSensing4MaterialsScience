@@ -154,7 +154,7 @@ class NOMADStructure(object):
             single_config_calc = self._get_single_config_calc(json_dict)
 
             # extract energy from the list in single_config_calc
-            for (gIndexRun, gIndexSingle), structure in single_config_calc.iteritems():
+            for (gIndexRun, gIndexSingle), structure in single_config_calc.items():
                 energy = structure.get('energy_total')
                 if energy is None:
             #        logger.warning(
@@ -225,7 +225,7 @@ class NOMADStructure(object):
             # Note: self.atoms is a dict with key (gIndexRun, gIndexDesc)
             # for (gIndexRun, gIndexDesc), structure in
             # system_descriptions.items():
-            for (gIndexRun, gIndexDesc), structure in system_descriptions.iteritems():
+            for (gIndexRun, gIndexDesc), structure in system_descriptions.items():
                 # old format
                 # labels = structure.get('atom_label')
                 labels = structure.get('atom_labels')

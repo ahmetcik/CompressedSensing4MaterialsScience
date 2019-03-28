@@ -45,7 +45,6 @@ selected_feature_list = ['r_s', 'r_p']
 allowed_operations = ['+']
 
 P, df_D = get_data(selected_feature_list, allowed_operations)
-
 # print derived features
 df_D
 def L0(P, D, dimension):
@@ -55,7 +54,7 @@ def L0(P, D, dimension):
     coef_min, permu_min = None, None
     for permu in combinations(range(n_columns),dimension):
         D_ls = D[:,permu+(-1,)]
-        coef, SE, __1, __2 = np.linalg.lstsq(D_ls,P)
+        coef, SE, __1, __2 = np.linalg.lstsq(D_ls,P,rcond=-1)
         try:
             if SE[0] < SE_min: 
                 SE_min = SE[0]
@@ -102,7 +101,7 @@ def lasso_fit(lam, P, D, feature_list):
     #get RMSE for least-square fit
     D_new = D[:, selected_indices]
     D_new = np.column_stack((D_new, np.ones(82)))
-    RMSE_LS = np.sqrt(np.linalg.lstsq(D_new,P)[1][0]/82.)
+    RMSE_LS = np.sqrt(np.linalg.lstsq(D_new,P, rcond=-1)[1][0]/82.)
         
     return RMSE_LASSO, RMSE_LS, coef, selected_features
 
@@ -165,4 +164,4 @@ for cv_i in range(1):
         features_count[dim-1].append( tuple(features) )        
         P_predict[dim-1,cv_i] = predicted_values
 
-print "Test run successful"
+print("Test run successful")

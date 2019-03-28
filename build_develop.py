@@ -34,6 +34,7 @@ energies_dict_ZB = {get_chemical_formula_binaries(at): at.get_potential_energy()
 # create and print data frame of energies and energy differences
 df = pd.DataFrame([energies_dict_RS, energies_dict_ZB, structures_dict_RS, structures_dict_ZB], 
                            index=['RS', 'ZB', 'struc_obj_RS', 'struc_obj_ZB']).T
+df[['RS', 'ZB']] = df[['RS', 'ZB']].astype(float)
 df['energy_diff'] = df['RS'] - df['ZB']
 df['min_struc_type'] = df[['RS', 'ZB']].idxmin(axis=1)
 df.index.name = 'chemical_formula'
@@ -51,3 +52,4 @@ df = df.rename(index=str, columns={'RS': 'energy_RS', 'ZB': 'energy_ZB'})
 columns  = ['energy_RS', 'energy_ZB', 'energy_diff', 'min_struc_type'][:]
 columns += df_atomic.columns.tolist() + ['struc_obj_RS', 'struc_obj_ZB', 'struc_obj_min']
 df[columns].to_pickle('data/data.pkl')
+

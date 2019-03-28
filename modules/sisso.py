@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import combinations, product
 import operator as op
+import functools
 
 class SissoRegressor(object):
     """ A simple implementation of the SISSO algorithm (R. Ouyang, S. Curtarolo, 
@@ -123,7 +124,7 @@ class SissoRegressor(object):
     def print_models(self, features):
         string = '%14s %16s\n' %('RMSE', 'Model')
         string += "\n".join( [self._get_model_string(features, i_iter) for i_iter in range(self.n_nonzero_coefs)] )
-        print string
+        print(string)
     
     def _initialize_variables(self):
         # variabels for standardizer
@@ -167,7 +168,7 @@ class SissoRegressor(object):
 
         for indices_combi in combinations_generator:
             D_ls = D[:, indices_combi]
-            coefs, square_error, __1, __2 = np.linalg.lstsq(D_ls, P)
+            coefs, square_error, __1, __2 = np.linalg.lstsq(D_ls, P, rcond=-1)
             try:
                 if square_error[0] < square_error_min: 
                     square_error_min = square_error[0]
@@ -188,8 +189,8 @@ class SissoRegressor(object):
         """ Binomial coefficient"""
         r = min(r, n-r) 
         if r == 0: return 1
-        numer = reduce(op.mul, xrange(n, n-r, -1)) 
-        denom = reduce(op.mul, xrange(1, r+1))
+        numer = functools.reduce(op.mul, range(n, n-r, -1)) 
+        denom = functools.reduce(op.mul, range(1, r+1))
         return numer//denom
 
     def _check_params(self, n_columns):
