@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from itertools import combinations
@@ -7,14 +8,13 @@ from sklearn.linear_model import Lasso
 import scipy.stats as ss
 import warnings
 from collections import Counter
-from bokeh.io import output_notebook
-
-import ase.io
-import nglview as nv
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.model_selection import GridSearchCV, LeaveOneOut
 
 from modules.sisso import SissoRegressor
 from modules.combine_features import combine_features
-from modules.viewer import Viewer
+from modules.viewer import show_structure, show_map
+warnings.filterwarnings('ignore')
 
 # load data
 df = pd.read_pickle("data/data.pkl")
@@ -22,8 +22,8 @@ df = pd.read_pickle("data/data.pkl")
 # print data without structure objects
 df.drop(['struc_obj_RS', 'struc_obj_ZB', 'struc_obj_min'], axis=1)
 
-example_structure = df.loc['AgBr', 'struc_obj_RS']
-view = nv.show_ase(example_structure *[3, 3, 3] )
+example_structure = df.loc['AgBr', 'struc_obj_RS'] * [3, 3, 3]
+#show_structure(example_structure)
 
 def get_data(selected_feature_list, allowed_operations):
     # add both '(A)', '(B)' to each feature
@@ -136,32 +136,66 @@ sisso = SissoRegressor(n_nonzero_coefs=3, n_features_per_sis_iter=10)
 
 sisso.fit(D, P)
 
-view = Viewer(show_geos=True)
-view.show_map(df, df_D, sisso.l0_selected_indices[1], is_show=False)
+# get 2d solution
+P_predict = sisso.predict(D, dim=2)
+D_selcted = df_D.values[:, sisso.l0_selected_indices[1]]
+features = df_D.columns[sisso.l0_selected_indices[1]]
 
-def split_data(P, D, cv_i):
-    P_1, P_test, P_2 = np.split(P, [cv_i, cv_i+1])
-    P_train = np.concatenate((P_1,P_2))
-    D_1, D_test, D_2 = np.split(D, [cv_i, cv_i+1])
-    D_train = np.concatenate((D_1,D_2))
-    return P_train, P_test, D_train, D_test
+# plot 2D map 
+#show_map(df, D_selcted, P_predict, features)
+
+# Leave-one-out cross-validation
+chemical_formulas = df_D.index.tolist()
 
 n_compounds = len(P)
-dimensions = range(1,4)
+dimensions = range(1, 4)
 features_count = [[] for i in range(3)]
 P_predict = np.empty([len(dimensions), n_compounds])
 
-sisso = SissoRegressor(n_nonzero_coefs=3, n_features_per_sis_iter=5)
+sisso = SissoRegressor(n_nonzero_coefs=3, n_features_per_sis_iter=1)
+loo = LeaveOneOut()
 
-for cv_i in range(1):
-    P_train, P_test, D_train, D_test = split_data(P, D, cv_i)
+for indices_train, index_test in loo.split(P):
+    i_cv = index_test[0]
         
-    sisso.fit(D_train, P_train)
+    sisso.fit(D[indices_train], P[indices_train])
+    
     for dim in dimensions:      
         features = [features_list[i] for i in sisso.l0_selected_indices[dim - 1]]
-        predicted_values = sisso.predict(D_test, dim=dim)
+        predicted_value = sisso.predict(D[index_test], dim=dim)[0]
         
         features_count[dim-1].append( tuple(features) )        
-        P_predict[dim-1,cv_i] = predicted_values
+        P_predict[dim-1, i_cv] = predicted_value
+        
+prediction_errors = np.linalg.norm(P-P_predict, axis=1)/np.sqrt(n_compounds)
+
+#kernel ridge
+selected_feature_list = ['IP', 'EA', 'r_s', 'r_p','r_d']
+allowed_operations = []
+
+P, df_D = get_data(selected_feature_list, allowed_operations)
+features_list = df_D.columns.tolist()
+D = df_D.values
+
+
+kr = GridSearchCV(KernelRidge(kernel='rbf', gamma=0.1), cv=2,
+                  param_grid={"alpha": np.logspace(-3, 0, 2),
+                              "gamma": np.logspace(-2, 1, 2)})
+P_predict_kr = []
+loo = LeaveOneOut()
+for train_indices, test_index in loo.split(P):
+    kr.fit(D[train_indices], P[train_indices])
+    P_predict_kr.append(kr.predict(D[test_index])[0])
+
+prediction_rmse_kr = np.linalg.norm(np.array(P_predict_kr) - P)/np.sqrt(P.size)
+
+maxi = max(max(P), max(P_predict_kr))
+mini = min(min(P), min(P_predict_kr))
+plt.plot([maxi,mini], [maxi,mini], 'k')
+plt.scatter(P, P_predict[-1], label='SISSO 3D, RMSE = %.3f eV/atom' % prediction_errors[dim-1])
+plt.scatter(P, P_predict_kr,  label='KR, RMSE = %.3f eV/atom' % prediction_rmse_kr)
+plt.xlabel('E_diff_DFT'), plt.ylabel('E_diff_predicted')
+plt.legend()
+
 
 print("Test run successful")
