@@ -55,17 +55,23 @@ def show_map(df, D_selcted, P_predict, features):
             <div>
                 <div>
                     <img
-                        src="@imgs" height="72" alt="@imgs" width="72"
-                        style="float: left; margin: 0px 15px 15px 0px;"
+                        src="@imgs" height="56" alt="@imgs" width="56"
+                        style="display: table; margin: 0 auto;"
                         border="2"
                     ></img>
                 </div>
                 <div>
-                    <span style="font-size: 17px; font-weight: bold;">@chemical_formulas</span>
+                    <span style="font-size: 15px; font-weight: bold;">@chemical_formulas</span>
                 </div>
+                
+                <div >
+                    <span style="font-size: 10px;">Ref. &#916E = @Ref eV/atom</span><br>
+                    <span style="font-size: 10px;">Pred. &#916E = @Pred eV/atom</span>
+                </div>
+                
                 <div>
-                    <span style="font-size: 15px;">Location</span>
-                    <span style="font-size: 10px; color: #696;">($x, $y)</span>
+                    <span style="font-size: 10px;">Location</span>
+                    <span style="font-size:  8px; color: #696;">($x, $y)</span>
                 </div>
             </div>
             """
@@ -110,7 +116,9 @@ def show_map(df, D_selcted, P_predict, features):
                 color=colors,
                 legend=min_structures,
                 imgs=imgs,
-                geo_files=geo_files
+                geo_files=geo_files,
+                Ref=P,
+                Pred=P_predict
             )
         )
 
@@ -228,4 +236,3 @@ def show_map(df, D_selcted, P_predict, features):
     """ %('%', script, div)
 
     display_html(page, raw=True)
-
