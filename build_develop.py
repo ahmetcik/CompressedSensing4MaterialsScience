@@ -52,4 +52,3 @@ df = df.rename(index=str, columns={'RS': 'energy_RS', 'ZB': 'energy_ZB'})
 columns  = ['energy_RS', 'energy_ZB', 'energy_diff', 'min_struc_type'][:]
 columns += df_atomic.columns.tolist() + ['struc_obj_RS', 'struc_obj_ZB', 'struc_obj_min']
 df[columns].to_pickle('data/data.pkl')
-
