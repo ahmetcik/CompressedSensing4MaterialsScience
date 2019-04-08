@@ -209,7 +209,7 @@ class SissoRegressor(object):
         else:
             n_l0_steps = sum([np.product([self.n_features_per_sis_iter]*dim)  for dim in range(2, self.n_nonzero_coefs+1)])
         
-        upper_limit = 80000
+        upper_limit = 200000
         if n_l0_steps > upper_limit:
             string_out  = "With the given settings in the l0-regularizaton %s combinations of features have to be considered." % n_l0_steps
             string_out += "For this tutorial the upper limit is %s. " % upper_limit
