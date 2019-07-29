@@ -11,13 +11,14 @@ from collections import Counter
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import GridSearchCV, LeaveOneOut
 
+from modules.load_data import load_data
 from modules.sisso import SissoRegressor
 from modules.combine_features import combine_features
 from modules.viewer import show_structure, show_map
 warnings.filterwarnings('ignore')
 
-# load data
-df = pd.read_pickle("data/data.pkl")
+# load data into pandas data frame
+df = load_data()
 
 # print data without structure objects
 df.drop(['struc_obj_RS', 'struc_obj_ZB', 'struc_obj_min'], axis=1)

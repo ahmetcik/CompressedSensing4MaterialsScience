@@ -49,6 +49,23 @@ df_atomic = pd.read_csv('data_develop/Octet_binaries_atomic_features.csv', index
 df = df.merge(df_atomic,  left_index=True, right_index=True)
 
 df = df.rename(index=str, columns={'RS': 'energy_RS', 'ZB': 'energy_ZB'})
+
+RS = df['struc_obj_RS'].values
+ZB = df['struc_obj_ZB'].values
+
 columns  = ['energy_RS', 'energy_ZB', 'energy_diff', 'min_struc_type'][:]
-columns += df_atomic.columns.tolist() + ['struc_obj_RS', 'struc_obj_ZB', 'struc_obj_min']
-df[columns].to_pickle('data/data.pkl')
+columns += df_atomic.columns.tolist() 
+print(df[columns])
+#columns += ['struc_obj_RS', 'struc_obj_ZB', 'struc_obj_min']
+#df[columns].to_pickle('data/data.pkl')
+
+df[columns].to_csv('data/data_table.csv')
+ase.io.write('data/structures_rs.xyz', RS)
+ase.io.write('data/structures_zb.xyz', ZB)
+
+
+
+
+
+
+
